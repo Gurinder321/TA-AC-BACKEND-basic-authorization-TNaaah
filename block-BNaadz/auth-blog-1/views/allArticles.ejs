@@ -1,9 +1,0 @@
-<% include partials/header-logout %>
-<p>Article list</p>
-<h1>All Articles</h1>
-
-<% articles.forEach(article => { %>
-<a href="/articles/<%= article.id %>">
-  <h2><%= article.name %></h2>
-</a>
-<% }) %> <% include partials/footer %>

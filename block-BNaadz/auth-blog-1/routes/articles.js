@@ -1,69 +1,111 @@
 var express = require('express');
-const Article = require('../models/article');
 var router = express.Router();
+var Register = require('../models/register');
+var Article = require('../models/article');
+var Comment = require('../models/comment');
+
 var auth = require('../middlewares/auth');
 
-// render all products
-router.get('/', (req, res, next) => {
+/* GET home page. */
+router.get('/', function (req, res, next) {
   Article.find({}, (err, articles) => {
-    if (err) {
-      return next(err);
-    }
-    res.render('allArticles', { articles });
+    console.log(req.register);
+    if (err) return next(err);
+    console.log(req.register.id);
+    res.render('articleList.ejs', { articles });
   });
 });
-
-router.get('/new', auth.loggedInUser, (req, res, next) => {
-  res.render('addArticle');
+//only logged in user can add
+router.get('/new', auth.loggedInRegister, function (req, res, next) {
+  res.render('addArticles');
 });
 
-// fetch only one article
+//fetch only one article
+
 router.get('/:id', (req, res, next) => {
   var id = req.params.id;
-  Article.findById(id).exec((err, article) => {
-    if (err) return next(err);
-    res.render('articleDetail', { article });
-  });
+  Article.findById(id)
+    .populate('comments', 'firstName lastName email')
+    .exec((err, article) => {
+      if (err) return next(err);
+      res.render('articleDetails', { article });
+    });
 });
+router.use(auth.loggedInRegister);
 
-router.use(auth.loggedInUser);
-
-router.get('/:id/edit', (req, res, next) => {
-  var id = req.params.id;
-  Article.findById(id, (err, article) => {
+//Saving data
+router.post('/', (req, res, next) => {
+  req.body.author = req.user._id;
+  Article.create(req.body, (err, createdarticle) => {
     if (err) return next(err);
-    res.render('editArticle', { article });
-  });
-});
-
-// create project
-
-//create product with details and save it in DB
-router.post('/new', (req, res, next) => {
-  Article.create(req.body, (err, article) => {
-    console.log(req.body);
-    if (err) {
-      return next(err);
-    }
     res.redirect('/articles');
   });
 });
 
-// update article
+router.get('/myArticle', function (req, res, next) {
+  Article.findById(req.user.id, (err, articles) => {
+    if (err) return next(err);
+    res.render('articleList.ejs', { articles });
+  });
+});
+
+//updating article form
+router.get('/:id/edit', (req, res, next) => {
+  var id = req.params.id;
+  if (req.user.id === id) {
+    Article.findById(id, (err, article) => {
+      if (err) return next(err);
+      res.render('editArticle', { article });
+    });
+  } else {
+    res.redirect('/articles');
+  }
+});
+
+//update article
 router.post('/:id', (req, res, next) => {
   var id = req.params.id;
-  Article.findByIdAndUpdate(id, req.body, (err, updateArticle) => {
+  Article.findByIdAndUpdate(id, req.body, (err, updatedarticle) => {
     if (err) return next(err);
     res.redirect('/articles/' + id);
   });
 });
 
+//delete article
 router.get('/:id/delete', (req, res, next) => {
   var id = req.params.id;
-  Article.findByIdAndDelete(id, (err, article) => {
-    if (err) return next(err);
+  if (req.user.id === id) {
+    Article.findByIdAndDelete(id, (err, article) => {
+      if (err) return next(err);
+      Comment.deleteMany({ articleId: article.id }, (err, info) => {
+        if (err) return next(err);
+        res.redirect('/articles');
+      });
+    });
+  } else {
     res.redirect('/articles');
+  }
+});
+
+//adding comments
+router.post('/:id/comments', (req, res, next) => {
+  var id = req.params.id;
+  req.body.articleId = id;
+  Comment.create(req.body, (err, comment) => {
+    if (err) return next(err);
+    Article.findByIdAndUpdate(id, { $push: { comments: comment._id } }, (err, updatedarticle) => {
+      if (err) return next(err);
+      res.redirect('/articles/' + id);
+    });
   });
 });
 
+//likes
+router.get('/:id/inc', (req, res, next) => {
+  var id = req.params.id;
+  Article.findByIdAndUpdate(id, { $inc: { likes: 1 } }, (err, article) => {
+    if (err) return next(err);
+    res.redirect('/articles/' + id);
+  });
+});
 module.exports = router;

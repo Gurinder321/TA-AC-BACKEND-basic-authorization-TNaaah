@@ -6,25 +6,20 @@ var logger = require('morgan');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var articlesRouter = require('./routes/articles');
+var flash = require('connect-flash');
 var auth = require('./middlewares/auth');
+require('dotenv').config();
+//routes
+var indexRouter = require('./routes/index');
+var registerRouter = require('./routes/register');
+var articlesRouter = require('./routes/articles');
+var commentsRouter = require('./routes/comments');
 
+//connect Mongo DB
+mongoose.connect('mongodb://localhost/article01', (err) => {
+  console.log(err ? err : 'Connected to Database');
+});
 var app = express();
-
-// connect to db
-mongoose.connect(
-  'mongodb://localhost/auth-blog-1',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  },
-  (err) => {
-    console.log('Connected', err ? false : true);
-  }
-);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -35,19 +30,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+//add session
 app.use(
   session({
-    secret: 'somerandomsecret',
-    saveUninitialized: false,
+    secret: process.env.SECRET,
     resave: false,
+    saveUninitialized: false,
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
   })
 );
 
-app.use(auth.userInfo);
+app.use(flash());
+
+app.use(auth.registerInfo);
+
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/register', registerRouter);
 app.use('/articles', articlesRouter);
+app.use('/comments', commentsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

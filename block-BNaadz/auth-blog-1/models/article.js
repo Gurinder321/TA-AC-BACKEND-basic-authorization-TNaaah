@@ -3,9 +3,12 @@ var Schema = mongoose.Schema;
 
 var articleSchema = new Schema(
   {
-    name: { type: String, required: true },
+    title: { type: String, required: true },
     description: { type: String, required: true },
-    author: { type: Schema.Types.ObjectId, ref: 'User' },
+    likes: { type: Number, default: 0 },
+    author: { type: Schema.Types.ObjectId, ref: 'Register', required: true },
+    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+    slug: String,
   },
   { timestamps: true }
 );
