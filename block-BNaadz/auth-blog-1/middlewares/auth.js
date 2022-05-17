@@ -1,17 +1,17 @@
-var User = require('../models/user');
+var Register = require('../models/Register');
 
 module.exports = {
-  loggedInUser: (req, res, next) => {
-    if (req.session && req.session.userId) {
+  loggedInRegister: (req, res, next) => {
+    if (req.session && req.session.registerId) {
       next();
     } else {
-      res.redirect('/users/login');
+      res.redirect('/register/login');
     }
   },
-  userInfo: (req, res, next) => {
-    var userId = req.session && req.session.userId;
-    if (userId) {
-      User.findById(userId, 'name email', (err, user) => {
+  registerInfo: (req, res, next) => {
+    var registerId = req.session && req.session.registerId;
+    if (registerId) {
+      Register.findById(registerId, 'firstName lastName email', (err, user) => {
         if (err) return next(err);
         req.user = user;
         res.locals.user = user;
