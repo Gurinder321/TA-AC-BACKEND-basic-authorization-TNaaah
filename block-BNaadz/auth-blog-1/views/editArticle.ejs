@@ -1,0 +1,15 @@
+<% include partials/header-logout %>
+
+<form action="/articles/<%= article.id %>" method="POST">
+  <h2>Update Article Details</h2>
+  <input type="text" name="name" placeholder="Name" value="<%= article.name %>" />
+  <input
+    type="text"
+    name="description"
+    placeholder="Add Description"
+    value="<%= article.description %>"
+  />
+  <button type="submit">Update Article</button>
+</form>
+
+<% include partials/footer %>

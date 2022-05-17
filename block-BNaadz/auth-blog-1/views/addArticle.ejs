@@ -1,0 +1,10 @@
+<% include partials/header-logout %>
+
+<form action="/articles/new" method="POST">
+  <h2>Add Article</h2>
+  <input type="text" name="name" placeholder="Add Title" />
+  <input type="text" name="description" placeholder="Add Description" />
+  <input type="submit" />
+</form>
+
+<% include partials/footer %>
