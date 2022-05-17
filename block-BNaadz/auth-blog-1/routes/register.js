@@ -51,4 +51,5 @@ router.get('/logout', (req, res, next) => {
   res.clearCookie('connect.sid');
   res.redirect('/register/login');
 });
+
 module.exports = router;
