@@ -1,0 +1,9 @@
+<% include partials/header-logout %>
+<p>Podcast list</p>
+<h1>All Podcast</h1>
+
+<% podcasts.forEach(podcast => { %>
+<a href="/podcasts/<%= podcast.id %>">
+  <h2><%= podcast.title %></h2>
+</a>
+<% }) %> <% include partials/footer %>
