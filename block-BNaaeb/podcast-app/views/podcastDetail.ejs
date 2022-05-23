@@ -1,0 +1,14 @@
+<% include partials/header-logout %>
+
+<h2>Title: <%= podcast.title %></h2>
+<h3>Description: <%= podcast.description %></h3>
+
+<a href="/podcasts/<%= podcast.id %>/edit">
+  <button>Update</button>
+</a>
+
+<a href="/podcasts/<%= podcast.id %>/delete">
+  <button>Delete</button>
+</a>
+
+<% include partials/footer %>

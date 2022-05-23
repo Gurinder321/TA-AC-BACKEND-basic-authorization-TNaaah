@@ -1,0 +1,16 @@
+<% include partials/header-logout %>
+
+<form action="/podcasts/<%= podcast.id %>" method="POST">
+  <h2>Update Podcast Details</h2>
+  <input type="text" name="title" placeholder="title" value="<%= podcast.title %>" />
+  <input
+    type="text"
+    name="description"
+    placeholder="description"
+    value="<%= podcast.description %>"
+  />
+
+  <button type="submit">Update Podcast</button>
+</form>
+
+<% include partials/footer %>

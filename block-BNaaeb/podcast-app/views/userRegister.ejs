@@ -1,0 +1,19 @@
+<% include partials/header %>
+<h1>Register As User</h1>
+
+<form action="/users/register" method="POST">
+  <% if(error){ %>
+  <p><%= error %></p>
+  <% } %>
+  <input type="text" name="name" placeholder="Enter Name" />
+  <input type="email" name="email" placeholder="Enter Email" />
+  <input type="password" name="password" placeholder="Enter Password" />
+  <select name="userType" id="select-user">
+    <option value="">--Select User Type--</option>
+    <option value="free">Free</option>
+    <option value="vip">VIP</option>
+    <option value="premium">Premium</option>
+  </select>
+  <input type="submit" value="Register" />
+</form>
+<% include partials/footer %>
